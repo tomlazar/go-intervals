@@ -50,15 +50,14 @@ func init() {
 
 	viper.SetConfigName("intervals")
 	viper.SetConfigType("yaml")
-	viper.AddConfigPath("./.config/")
-	viper.AddConfigPath("~/.config/")
+	viper.AddConfigPath(".config/")
+
+	viper.SetDefault("INTERVALS_APIKEY", "")
+	viper.SetDefault("INTERVALS_URL", "")
 
 	viper.AutomaticEnv()
 
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.WithField("ERROR", err).Fatal("Cound not read in config")
-	}
+	viper.ReadInConfig()
 }
 
 // NewClient returns a new Intervals API client. If a nil httpClient is

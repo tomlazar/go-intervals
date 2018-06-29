@@ -1,0 +1,26 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: instrumentisto/dep
+
+    working_directory: /go/src/github.com/tomlazar/go-intervals
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - godep
+
+      - run: go get github.com/mattn/goveralls
+
+      - run: dep ensure
+
+      - save_cache:
+          key: godep
+          paths:
+            - "/go/pkg"
+
+      - run: go test -v -race -coverprofile=/tmp/coverage.out
+      - run: $GOPATH/bin/goveralls -coverprofile=/tmp/coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
