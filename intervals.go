@@ -19,11 +19,11 @@ import (
 // Client contains all the core logic for making requests
 type Client struct {
 	clientMu sync.Mutex
-	client   *http.Client
 	config   Config
+	client   *http.Client
 
-	// BaseURL and APIKey are constant set at client start
-	BaseURL *url.URL
+	// baseURL and APIKey are constant set at client start
+	baseURL *url.URL
 
 	common         service
 	PersonService  *PersonService
@@ -66,7 +66,7 @@ func NewClient(config Config, httpClient *http.Client) *Client {
 	c.PersonService = (*PersonService)(&c.common)
 	c.TimeService = (*TimeService)(&c.common)
 	c.ProjectService = (*ProjectService)(&c.common)
-	c.BaseURL = baseurl
+	c.baseURL = baseurl
 	c.config = config
 
 	return c
@@ -74,11 +74,11 @@ func NewClient(config Config, httpClient *http.Client) *Client {
 
 // NewRequest creates an API request. A relative url can be provided in urlStr,
 func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
-	if !strings.HasSuffix(c.BaseURL.Path, "/") {
-		return nil, fmt.Errorf("BaseURL must have a trailing slash, but %q does not", c.BaseURL)
+	if !strings.HasSuffix(c.baseURL.Path, "/") {
+		return nil, fmt.Errorf("BaseURL must have a trailing slash, but %q does not", c.baseURL)
 	}
 
-	u, err := c.BaseURL.Parse(urlStr)
+	u, err := c.baseURL.Parse(urlStr)
 	if err != nil {
 		return nil, err
 	}

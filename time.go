@@ -15,16 +15,16 @@ type TimeResponse struct {
 
 // Time is cool
 type Time struct {
-	ID           int    `json:"id,omitempty"`
-	ProjectID    int    `json:"projectid,omitempty"`
-	ModuleID     int    `json:"moduleid,omitempty"`
-	TaskID       int    `json:"taskid,omitempty"`
-	WorkTypeID   int    `json:"worktypeid,omitempty"`
+	ID           string `json:"id,omitempty"`
+	ProjectID    string `json:"projectid,omitempty"`
+	ModuleID     string `json:"moduleid,omitempty"`
+	TaskID       string `json:"taskid,omitempty"`
+	WorkTypeID   string `json:"worktypeid,omitempty"`
 	PersonID     string `json:"personid,omitempty"`
 	Date         string `json:"date,omitempty"`
 	Time         string `json:"time,omitempty"`
 	Description  string `json:"description,omitempty"`
-	Billable     bool   `json:"billable,omitempty"`
+	Billable     string `json:"billable,omitempty"`
 	DateModified string `json:"datemodified,omitempty"`
 	DateISO      string `json:"dateiso,omitempty"`
 	Module       string `json:"module,omitempty"`
@@ -33,10 +33,10 @@ type Time struct {
 	FirstName    string `json:"firstname,omitempty"`
 	LastName     string `json:"lastname,omitempty"`
 	Active       string `json:"active,omitempty"`
-	ClientID     int    `json:"clientid,omitempty"`
+	ClientID     string `json:"clientid,omitempty"`
 	Client       string `json:"client,omitempty"`
-	ClientActive bool   `json:"clientactive,omitempty"`
-	StatusID     int    `json:"statusid,omitempty"`
+	ClientActive string `json:"clientactive,omitempty"`
+	StatusID     string `json:"statusid,omitempty"`
 }
 
 // TimeOptions set of options for Time

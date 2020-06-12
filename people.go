@@ -6,28 +6,28 @@ type PersonService service
 // PersonResponse the collection of people requtned from one request
 type PersonResponse struct {
 	*baseResponse
-	People []Person `json:"person"`
+	People []*Person `json:"person"`
 }
 
 // Person is cool
 type Person struct {
 	ID             string `json:"id"`
-	LocalID        int    `json:"localid"`
-	ClientID       int    `json:"clientid"`
+	LocalID        string `json:"localid"`
+	ClientID       string `json:"clientid"`
 	Title          string `json:"title"`
 	FirstName      string `json:"firstname"`
 	LastName       string `json:"lastname"`
 	PrimaryAccount string `json:"primaryaccount"`
 	Notes          string `json:"notes"`
-	AllProjects    bool   `json:"allprojects"`
-	Active         bool   `json:"active"`
-	Private        bool   `json:"private"`
+	AllProjects    string `json:"allprojects"`
+	Active         string `json:"active"`
+	Private        string `json:"private"`
 	Tips           string `json:"tips"`
 	Username       string `json:"username"`
-	GroupID        int    `json:"groupid"`
+	GroupID        string `json:"groupid"`
 	Group          string `json:"group"`
 	Client         string `json:"client"`
-	NumLogins      int    `json:"numlogins"`
+	NumLogins      string `json:"numlogins"`
 	LastLogin      string `json:"lastlogin"`
 }
 
@@ -39,7 +39,7 @@ type PersonOptions struct {
 }
 
 // List data
-func (s *PersonService) List(opt *PersonOptions) ([]Person, error) {
+func (s *PersonService) List(opt *PersonOptions) ([]*Person, error) {
 	if opt == nil {
 		opt = &PersonOptions{
 			Limit: 100,
