@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -13,25 +14,27 @@ import (
 	"sync"
 
 	"github.com/google/go-querystring/query"
-	"github.com/spf13/viper"
-
-	log "github.com/sirupsen/logrus"
 )
-
-var lock *int
 
 // Client contains all the core logic for making requests
 type Client struct {
 	clientMu sync.Mutex
 	client   *http.Client
+	config   Config
 
 	// BaseURL and APIKey are constant set at client start
 	BaseURL *url.URL
-	APIKey  string
 
-	common        service
-	PersonService *PersonService
-	TimeService   *TimeService
+	common         service
+	PersonService  *PersonService
+	TimeService    *TimeService
+	ProjectService *ProjectService
+}
+
+// Config options for the client
+type Config struct {
+	IntervalsURL string
+	APIKey       string
 }
 
 type baseResponse struct {
@@ -45,29 +48,14 @@ type service struct {
 	client *Client
 }
 
-func init() {
-	log.SetFormatter(&log.TextFormatter{})
-
-	viper.SetConfigName("intervals")
-	viper.SetConfigType("yaml")
-	viper.AddConfigPath(".config/")
-
-	viper.SetDefault("INTERVALS_APIKEY", "")
-	viper.SetDefault("INTERVALS_URL", "")
-
-	viper.AutomaticEnv()
-
-	viper.ReadInConfig()
-}
-
 // NewClient returns a new Intervals API client. If a nil httpClient is
 // provided, http.DefaultClient will be used.
-func NewClient(httpClient *http.Client) *Client {
+func NewClient(config Config, httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
 
-	baseurl, err := url.Parse(viper.GetString("INTERVALS_URL"))
+	baseurl, err := url.Parse(config.IntervalsURL)
 
 	if err != nil {
 		log.Fatal(err)
@@ -77,15 +65,11 @@ func NewClient(httpClient *http.Client) *Client {
 	c.common.client = c
 	c.PersonService = (*PersonService)(&c.common)
 	c.TimeService = (*TimeService)(&c.common)
+	c.ProjectService = (*ProjectService)(&c.common)
 	c.BaseURL = baseurl
-	c.APIKey = viper.GetString("INTERVALS_APIKEY")
+	c.config = config
 
 	return c
-}
-
-func basicAuth(username, password string) string {
-	auth := username + ":" + password
-	return base64.StdEncoding.EncodeToString([]byte(auth))
 }
 
 // NewRequest creates an API request. A relative url can be provided in urlStr,
@@ -119,7 +103,7 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 		req.Header.Set("Content-Type", "application/json")
 	}
 	req.Header.Set("Accept", "application/json")
-	req.Header.Add("Authorization", "Basic "+basicAuth(c.APIKey, "X"))
+	req.Header.Add("Authorization", c.config.auth())
 
 	return req, nil
 }
@@ -143,6 +127,12 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	}
 
 	return resp, nil
+}
+
+func (c Config) auth() string {
+	bytes := []byte(fmt.Sprintf("%v:X", c.APIKey))
+	tok := base64.StdEncoding.EncodeToString(bytes)
+	return fmt.Sprintf("Basic %v", tok)
 }
 
 func addOptions(s string, opt interface{}) (string, error) {
